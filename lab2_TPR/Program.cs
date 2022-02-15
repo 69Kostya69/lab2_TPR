@@ -76,6 +76,7 @@ namespace lab2_TPR
         }
         private static void Neumann(int[,] matrix)
         {
+            Dictionary<int, List<int>> alternatives = new Dictionary<int, List<int>>();
             List<int> S0 = new List<int>();
             List<int> S = new List<int>();
             List<int> Q0 = new List<int>();
@@ -91,23 +92,19 @@ namespace lab2_TPR
 
                 section.Clear();
             }
-
             Q0 = S0;
-            
-            int[,] res = new int[15,15];
-            int p = 0, l = 0, g=0;
+            int p = 0, g=0;
 
             Console.Write("S0=");
             foreach (int s in S0)
             {
                 int a = s;
-                Console.Write(++a + " ");
-                res[p, l] = s;
-                res[p, l] = res[p, l] + 1;
-                l++;
+                Console.Write(++a + " ");               
             }
+            alternatives.Add(0, new List<int>(S0));
             Console.WriteLine();
-            l = 0;
+
+            var temp = new List<int>();
 
             while (S0.Count != matrix.GetLength(0))
             {
@@ -120,22 +117,20 @@ namespace lab2_TPR
                         S.Add(i);
                     }
                 }
-
                 S0.AddRange(S);
-               
+                
                 Console.Write($"S{p}\\S{p-1}=");
 
                 foreach (int s in S)
                 {
                     int a = s;
                     Console.Write(++a + " ");
-                    res[p, l] = s;
-                    res[p, l] = res[p, l] + 1;
-                    l++;
+                    temp.Add(s);
                 }
+                alternatives.Add(p, new List<int>(temp));
+                temp.Clear();
 
                 Console.WriteLine();
-                l = 0;
                 S.Clear();
             }
             Console.WriteLine();
