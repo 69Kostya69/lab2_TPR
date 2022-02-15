@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -75,7 +76,92 @@ namespace lab2_TPR
         }
         private static void Neumann(int[,] matrix)
         {
-           
+            List<int> S0 = new List<int>();
+            List<int> S = new List<int>();
+            List<int> Q0 = new List<int>();
+
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                var section = Upper_section(matrix, i);
+
+                if(section.Where(x=>x==1).Count()==0)
+                {
+                    S0.Add(i);
+                }
+
+                section.Clear();
+            }
+
+            Q0 = S0;
+            int[,] res = new int[15,15];
+            int p = 0, l = 0, g=0;
+
+            Console.Write("S0=");
+            foreach (int s in S0)
+            {
+                int a = s;
+                Console.Write(++a + " ");
+                res[p, l] = s;
+                res[p, l] = res[p, l] + 1;
+                l++;
+            }
+            Console.WriteLine();
+            l = 0;
+
+            while (S0.Count != matrix.GetLength(0))
+            {
+                p++;
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    var section = Upper_section_index(matrix, i);
+                    if(S0.Intersect(section).Count()==section.Count() && !S0.Contains(i))
+                    {
+                        S.Add(i);
+                    }
+                }
+
+                S0.AddRange(S);
+
+                Console.Write($"S{p}=");
+
+                foreach (int s in S0)
+                {
+                    int a = s;
+                    Console.Write(++a + " ");
+                    res[p, l] = s;
+                    res[p, l] = res[p, l] + 1;
+                    l++;
+                }
+                Console.WriteLine();
+                l = 0;
+                S.Clear();
+            }
+            Console.WriteLine();
+
+            List<int> Q = new List<int>();
+
+            
+        }
+
+        private static List<int> Upper_section(int[,] matrix, int column)
+        {
+            List<int> upperSection = new List<int>();
+            for (int i = 0; i < matrix.GetLength(1); i++)
+            {
+                upperSection.Add(matrix[i, column]);
+            }
+            return upperSection;
+        }
+
+        private static List<int> Upper_section_index(int[,] matrix, int column)
+        {
+            List<int> upperSection = new List<int>();
+            for (int i = 0; i < matrix.GetLength(1); i++)
+            {
+                if(matrix[i, column]==1)
+                upperSection.Add(i);
+            }
+            return upperSection;
         }
 
         private static void K_Optimize(int[,] matrix)
