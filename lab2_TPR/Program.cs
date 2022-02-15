@@ -93,6 +93,7 @@ namespace lab2_TPR
             }
 
             Q0 = S0;
+            
             int[,] res = new int[15,15];
             int p = 0, l = 0, g=0;
 
@@ -121,10 +122,10 @@ namespace lab2_TPR
                 }
 
                 S0.AddRange(S);
+               
+                Console.Write($"S{p}\\S{p-1}=");
 
-                Console.Write($"S{p}=");
-
-                foreach (int s in S0)
+                foreach (int s in S)
                 {
                     int a = s;
                     Console.Write(++a + " ");
@@ -132,6 +133,7 @@ namespace lab2_TPR
                     res[p, l] = res[p, l] + 1;
                     l++;
                 }
+
                 Console.WriteLine();
                 l = 0;
                 S.Clear();
