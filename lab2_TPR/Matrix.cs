@@ -64,6 +64,117 @@ namespace lab2_TPR
             return "Dominance did not work\n";
         }
 
+        public int[,] Reverse()
+        {
+            int[,] reverse = new int[data.GetLength(0), data.GetLength(1)];
+
+            for (int i = 0; i < data.GetLength(0); i++)
+            {
+                for (int j = 0; j < data.GetLength(1); j++)
+                {
+                    int temp;
+                    temp = data[i, j];
+                    reverse[i, j] = data[j, i];
+                    reverse[j, i] = temp;
+                }
+            }
+            return reverse;
+        }
+
+        public int[,] GetSymetricPart(int[,] reverseMatrix)
+        {
+            int[,] symetricPart = new int[data.GetLength(0), data.GetLength(1)];
+
+            for (int i = 0; i < data.GetLength(0); i++)
+            {
+                for (int j = 0; j < data.GetLength(1); j++)
+                {
+                   if(data[i,j]==1 && data[j,i] == 1 && data[i,j] == reverseMatrix[i,j])
+                   {
+                        symetricPart[i, j] = 1;
+                   }
+                   else
+                    {
+                        symetricPart[i, j] = 0;
+                    }
+                }
+            }
+            return symetricPart;
+        }
+
+        public int[,] GetAsymetricPart()
+        {
+            int[,] asymetricPart = new int[data.GetLength(0), data.GetLength(1)];
+
+            for (int i = 0; i < data.GetLength(0); i++)
+            {
+                for (int j = 0; j < data.GetLength(1); j++)
+                {
+                    if (data[i, j] == 1 && data[j,i] != 1)
+                    {
+                        asymetricPart[i, j] = 1;
+                    }
+                    else
+                    {
+                        asymetricPart[i, j] = 0;
+                    }
+                }
+            }
+            return asymetricPart;
+        }
+
+        public int[,] GetNonComparabilityRatio()
+        {
+            int[,] nonComparabilityRatio = new int[data.GetLength(0), data.GetLength(1)];
+
+            for (int i = 0; i < data.GetLength(0); i++)
+            {
+                for (int j = 0; j < data.GetLength(1); j++)
+                {
+                    if (data[i, j] == 0 && data[j, i] == 0)
+                    {
+                        nonComparabilityRatio[i, j] = 1;
+                    }
+                    else
+                    {
+                        nonComparabilityRatio[i, j] = 0;
+                    }
+                }
+            }
+            return nonComparabilityRatio;
+        }
+
+
+        //private static double Determinant(Matrix mA)
+        //{
+
+        //}
+
+        //private Matrix Exclude(int row, int column)
+        //{
+
+        //}
+
+        //public static int[,] Inverse(Matrix mA, uint round = 0)
+        //{
+        //    if (mA.M != mA.N) throw new ArgumentException("The inverse matrix exists only for square, non-singular, matrices.");
+        //    int[,] matrix = new int[mA.M, mA.N]; 
+        //    double determinant = Determinant(mA); 
+
+        //    if (determinant == 0) return matrix; 
+
+        //    for (int i = 0; i < mA.M; i++)
+        //    {
+        //        for (int t = 0; t < mA.N; t++)
+        //        {
+        //            Matrix tmp = mA.Exclude(i, t);  
+        //                                            
+        //            matrix[t, i] = round == 0 ? (1 / determinant) * Math.Pow(-1, i + t) * Determinant(tmp) : Math.Round(((1 / determinant) * Math.Pow(-1, i + t) * Determinant(tmp)), (int)round, MidpointRounding.ToEven);
+        //        }
+        //    }
+        //    return matrix;
+        //}
+
         public string FindXr()
         {
             List<int> r = new List<int>();

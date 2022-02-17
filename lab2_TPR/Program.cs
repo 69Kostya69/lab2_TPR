@@ -50,13 +50,53 @@ namespace lab2_TPR
         }
 
         private static bool IsCyclic(int[,] matrix)
-        {            
-            Matrix matr = new Matrix(matrix);
-            if (matr.IsASymetric())
+        {
+         
+            List<int> R = new List<int>();
+            List<int> help = new List<int>();
+            List<int> help1 = new List<int>();
+            List<int> R1 = new List<int>();
+            List<int> R2 = new List<int>();
+            List<int> End = new List<int>();
+            for (int i=0; i<matrix.GetLength(0); i++)
             {
-                return false;
+                R.AddRange(Lower_section_index(matrix, i));
+                R1.AddRange(R);
+                End.AddRange(R);
+
+                while (R.Count != 0)
+                {
+                    foreach (int element in R)
+                    {
+                        R1.AddRange(Lower_section_index(matrix, element));
+                    }
+                    var temp = R1.Distinct();
+                    help.Clear();
+                    help.AddRange(temp);
+                    R1.Clear();
+                    R1.AddRange(help);
+                    End = R1;
+
+                    help1.AddRange(R);
+                    R.Clear();
+                    R2.AddRange(help1.Except(R2));
+                    R.AddRange(R1.Except(R2));
+
+                }
+
+                if(help1.Contains(i))
+                {
+                    return true;
+                }
+                R.Clear();
+                help.Clear();
+                help1.Clear();
+                R1.Clear();
+                R2.Clear();
+                End.Clear(); 
+
             }
-            else return true;                     
+            return false;
         }
 
         private static void Сhoose_Alghoritm(int[,] matrix)
@@ -135,9 +175,41 @@ namespace lab2_TPR
             }
             Console.WriteLine();
 
-            List<int> Q = new List<int>();
+            int plus = 0;
 
-            
+            List<int> Q = new List<int>();
+            List<int> temp1 = new List<int>();
+            List<int> temp2 = new List<int>();
+            alternatives.TryGetValue(0, out Q);
+            plus += Q.Count();
+
+            while(plus<matrix.GetLength(0))
+            {
+                for(int z=1; z<alternatives.Count(); z++)
+                {
+                    alternatives.TryGetValue(z, out temp1);
+                    foreach(int s in temp1)
+                    {
+                        if((Upper_section_index(matrix,s).Intersect(Q)).Count()==0)
+                        {
+                            temp2.Add(s);                            
+                        }
+                        plus++;
+                    }
+                    Q.AddRange(temp2);
+                    temp2.Clear();
+                    temp1.Clear();
+                }
+            }
+
+            Console.Write("Xhm=");
+            foreach (int s in Q)
+            {
+                int a = s;
+                Console.Write(++a + " ");
+            }
+
+            Console.WriteLine("\n================================================================\n");
         }
 
         private static List<int> Upper_section(int[,] matrix, int column)
@@ -161,13 +233,108 @@ namespace lab2_TPR
             return upperSection;
         }
 
-        private static void K_Optimize(int[,] matrix)
+        private static List<int> Lower_section_index(int[,] matrix, int row)
         {
-            
-
-
+            List<int> lowerSection = new List<int>();
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                if (matrix[row, i] == 1)
+                    lowerSection.Add(i);
+            }
+            return lowerSection;
         }
 
+        private static void K_Optimize(int[,] matrix)
+        {
+            int[,] reverseMatrix = new int[matrix.GetLength(0), matrix.GetLength(1)];
+            int[,] symetricPart = new int[matrix.GetLength(0), matrix.GetLength(1)];
+            int[,] asymetricPart = new int[matrix.GetLength(0), matrix.GetLength(1)];
+            int[,] nonComparabilityRatio = new int[matrix.GetLength(0), matrix.GetLength(1)];
+
+            string[,] symetricPartA = new string[matrix.GetLength(0), matrix.GetLength(1)];
+            string[,] asymetricPartA = new string[matrix.GetLength(0), matrix.GetLength(1)];
+            string[,] nonComparabilityRatioA = new string[matrix.GetLength(0), matrix.GetLength(1)];
+            string[,] stringMatrix = new string[matrix.GetLength(0), matrix.GetLength(1)];
+
+            Matrix matr = new Matrix(matrix);
+            reverseMatrix = matr.Reverse();
+            symetricPart = matr.GetSymetricPart(reverseMatrix);
+            asymetricPart = matr.GetAsymetricPart();
+            nonComparabilityRatio = matr.GetNonComparabilityRatio();
+
+            symetricPartA = WriteAlphaMatrix(symetricPart, "I");
+            asymetricPartA = WriteAlphaMatrix(asymetricPart, "P");
+            nonComparabilityRatioA = WriteAlphaMatrix(nonComparabilityRatio, "N");
+
+            stringMatrix = СombineMatrix(symetricPartA, asymetricPartA, nonComparabilityRatioA);
+
+            WriteMatrix(stringMatrix);
+
+            int[,] k1Matrix = new int[matrix.GetLength(0), matrix.GetLength(1)];
+            int[,] k2Matrix = new int[matrix.GetLength(0), matrix.GetLength(1)];
+            int[,] k3Matrix = new int[matrix.GetLength(0), matrix.GetLength(1)];
+            int[,] k4Matrix = new int[matrix.GetLength(0), matrix.GetLength(1)];
+
+            k1Matrix = kOpt(symetricPart, asymetricPart, nonComparabilityRatio, matrix.GetLength(0));
+            k2Matrix = kOpt(null, asymetricPart, nonComparabilityRatio, matrix.GetLength(0));
+            k3Matrix = kOpt(symetricPart, asymetricPart, null, matrix.GetLength(0));
+            k4Matrix = kOpt(null, asymetricPart, null, matrix.GetLength(0));
+
+            
+            Console.WriteLine();
+        }
+
+        public static int[,] kOpt(int[,] sym, int[,]asym, int[,]nonComp, int size)
+        {
+            int[,] down = new int[sym.GetLength(0), sym.GetLength(1)];
+
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    //if (symetricPart[i, j] == 1)
+                    //{
+                    //    k1Matrix[i, j] = 1;
+                    //}
+                    //if (asymetricPart[i, j] == 1)
+                    //{
+                    //    k1Matrix[i, j] = 1;
+                    //}
+                    //if (nonComparabilityRatio[i, j] == 1)
+                    //{
+                    //    k1Matrix[i, j] = 1;
+                    //}
+                }
+            }
+            return new int[1,1];
+        }
+        public static string[,] СombineMatrix(string[,] symetricPart, string[,] asymetricPart, string[,] nonComparabilityRatio)
+        {
+            string[,] fullMatrix = new string[symetricPart.GetLength(0), symetricPart.GetLength(1)];
+            for (int i = 0; i < symetricPart.GetLength(0); i++)
+            {
+                for (int j = 0; j < symetricPart.GetLength(1); j++)
+                {
+                    if(symetricPart[i,j] !="-")
+                    {
+                        fullMatrix[i, j] = "I";
+                    }
+                    else if (asymetricPart[i, j] != "-")
+                    {
+                        fullMatrix[i, j] = "P";
+                    }
+                    else if (nonComparabilityRatio[i, j] != "-")
+                    {
+                        fullMatrix[i, j] = "N";
+                    }
+                    else
+                    {
+                        fullMatrix[i, j] = "-";
+                    }
+                }
+            }
+            return fullMatrix;
+        }
         public static void ReadMatrix(ref int[,] matrix)
         {
 
@@ -196,6 +363,99 @@ namespace lab2_TPR
             }
             Console.WriteLine("\n");
         }
+        public static void WriteMatrix(string[,] matrix)
+        {
+            Console.WriteLine("====================================================================");
+            Console.WriteLine("Matrix:");
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    Console.Write(matrix[i, j] + " ");
+                }
+                Console.WriteLine("  ");
+            }
+            Console.WriteLine("\n");
+        }
+        public static string[,] WriteAlphaMatrix(int[,] matrix, string part)
+        {
+            string[,] stringMatrix = new string[matrix.GetLength(0), matrix.GetLength(1)];
+
+            Console.WriteLine("====================================================================");
+            
+            if(part=="I")
+            {
+                Console.WriteLine("Symmetrical part:");
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrix.GetLength(1); j++)
+                    {
+                        if (matrix[i, j] == 1)
+                        {
+                            stringMatrix[i, j] = "I";
+                            Console.Write("I" + " ");
+                        }
+                        else
+                        {
+                            stringMatrix[i, j] = "-";
+                            Console.Write("-" + " ");
+                        }
+                    }
+                    Console.WriteLine("  ");
+                }
+                Console.WriteLine("\n");
+                return stringMatrix;
+            }
+            else if(part == "P")
+            {
+                Console.WriteLine("Asymmetrical part:");
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrix.GetLength(1); j++)
+                    {
+                        if (matrix[i, j] == 1)
+                        {
+                            stringMatrix[i, j] = "P";
+                            Console.Write("P" + " ");
+                        }
+                        else
+                        {
+                            stringMatrix[i, j] = "-";
+                            Console.Write("-" + " ");
+                        }
+                    }
+                    Console.WriteLine("  ");
+                }
+                Console.WriteLine("\n");
+                return stringMatrix;
+            }
+
+            else if(part == "N")
+            {
+                Console.WriteLine("Non comparability part:");
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrix.GetLength(1); j++)
+                    {
+                        if (matrix[i, j] == 1)
+                        {
+                            stringMatrix[i, j] = "N";
+                            Console.Write("N" + " ");
+                        }
+                        else
+                        {
+                            stringMatrix[i, j] = "-";
+                            Console.Write("-" + " ");
+                        }
+                    }
+                    Console.WriteLine("  ");
+                }
+                Console.WriteLine("\n");
+                return stringMatrix;
+            }
+            return stringMatrix;
+        }
+
 
         static void Main(string[] args)
         {
