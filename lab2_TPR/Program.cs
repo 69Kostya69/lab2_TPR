@@ -27,7 +27,6 @@ namespace lab2_TPR
             Console.WriteLine("====================================================================");
 
         }
-
         private static void Locking(int[,] matrix)
         {         
             WriteMatrix(matrix);
@@ -48,7 +47,6 @@ namespace lab2_TPR
             Console.WriteLine("====================================================================");
 
         }
-
         private static bool IsCyclic(int[,] matrix)
         {
          
@@ -98,7 +96,6 @@ namespace lab2_TPR
             }
             return false;
         }
-
         private static void Сhoose_Alghoritm(int[,] matrix)
         {
             WriteMatrix(matrix);
@@ -211,7 +208,6 @@ namespace lab2_TPR
 
             Console.WriteLine("\n================================================================\n");
         }
-
         private static List<int> Upper_section(int[,] matrix, int column)
         {
             List<int> upperSection = new List<int>();
@@ -221,7 +217,6 @@ namespace lab2_TPR
             }
             return upperSection;
         }
-
         private static List<int> Upper_section_index(int[,] matrix, int column)
         {
             List<int> upperSection = new List<int>();
@@ -232,7 +227,6 @@ namespace lab2_TPR
             }
             return upperSection;
         }
-
         private static List<int> Lower_section_index(int[,] matrix, int row)
         {
             List<int> lowerSection = new List<int>();
@@ -243,7 +237,6 @@ namespace lab2_TPR
             }
             return lowerSection;
         }
-
         private static void K_Optimize(int[,] matrix)
         {
             int[,] reverseMatrix = new int[matrix.GetLength(0), matrix.GetLength(1)];
@@ -275,38 +268,353 @@ namespace lab2_TPR
             int[,] k3Matrix = new int[matrix.GetLength(0), matrix.GetLength(1)];
             int[,] k4Matrix = new int[matrix.GetLength(0), matrix.GetLength(1)];
 
-            k1Matrix = kOpt(symetricPart, asymetricPart, nonComparabilityRatio, matrix.GetLength(0));
-            k2Matrix = kOpt(null, asymetricPart, nonComparabilityRatio, matrix.GetLength(0));
-            k3Matrix = kOpt(symetricPart, asymetricPart, null, matrix.GetLength(0));
-            k4Matrix = kOpt(null, asymetricPart, null, matrix.GetLength(0));
+            k1Matrix = kOpt(symetricPart, asymetricPart, nonComparabilityRatio, matrix.GetLength(0), 1);
+            k2Matrix = kOpt(null, asymetricPart, nonComparabilityRatio, matrix.GetLength(0), 2);
+            k3Matrix = kOpt(symetricPart, asymetricPart, null, matrix.GetLength(0), 3);
+            k4Matrix = kOpt(null, asymetricPart, null, matrix.GetLength(0), 4);
+
+            WriteMatrix(k4Matrix);
+            List<int> kMax = new List<int>();
+            List<int> kOptim = new List<int>();
+
+            Console.WriteLine("========================================================");
+            Console.WriteLine("Results");
+            for (int i = 0; i < k1Matrix.GetLength(0); i++)
+            {
+                List<int> op = new List<int>();
+                for (int j = 0; j < k1Matrix.GetLength(1); j++)
+                {
+                    op.Add(k1Matrix[i, j]);
+                    
+                    if (k1Matrix[i, j] == 0 && Explore_Column(k1Matrix.GetLength(1), j, k1Matrix))
+                    {
+                        
+                    }
+                    else if (k1Matrix[i, j] == 1)
+                    {
+                        
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    
+                    if(j==k1Matrix.GetLength(0)-1)
+                    {
+                        if (op.Where(x => x == 0).Count() == 0)
+                        {
+                            kOptim.Add(i);
+                        }
+                        else
+                        {
+                            kMax.Add(i);
+                        }
+                    }
+                }
+                op.Clear();
+                
+            }
 
             
-            Console.WriteLine();
-        }
-
-        public static int[,] kOpt(int[,] sym, int[,]asym, int[,]nonComp, int size)
-        {
-            int[,] down = new int[sym.GetLength(0), sym.GetLength(1)];
-
-            for (int i = 0; i < size; i++)
+            Console.Write("K1-Max: ");
+            foreach (var item in kMax)
             {
-                for (int j = 0; j < size; j++)
+                int k =item;
+                Console.Write(++k + " ");
+            }
+
+            Console.WriteLine(" ");
+
+            Console.Write("K1-Opt: ");
+            foreach (var item in kOptim)
+            {
+                int k = item;
+                Console.Write(++k + " ");
+            }
+
+            Console.WriteLine(" ");
+
+            kOptim.Clear();
+            kMax.Clear();
+
+            for (int i = 0; i < k2Matrix.GetLength(0); i++)
+            {
+                List<int> op = new List<int>();
+                for (int j = 0; j < k2Matrix.GetLength(1); j++)
                 {
-                    //if (symetricPart[i, j] == 1)
-                    //{
-                    //    k1Matrix[i, j] = 1;
-                    //}
-                    //if (asymetricPart[i, j] == 1)
-                    //{
-                    //    k1Matrix[i, j] = 1;
-                    //}
-                    //if (nonComparabilityRatio[i, j] == 1)
-                    //{
-                    //    k1Matrix[i, j] = 1;
-                    //}
+                    op.Add(k2Matrix[i, j]);
+
+                    if (k2Matrix[i, j] == 0 && Explore_Column(k2Matrix.GetLength(1), j, k2Matrix))
+                    {
+
+                    }
+                    else if (k2Matrix[i, j] == 1)
+                    {
+
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    if (j == k2Matrix.GetLength(0) - 1)
+                    {
+                        if (op.Where(x => x == 0).Count() == 0)
+                        {
+                            kOptim.Add(i);
+                        }
+                        else
+                        {
+                            kMax.Add(i);
+                        }
+                    }
+                }
+                op.Clear();
+
+            }
+
+            Console.Write("K2-Max: ");
+            foreach (var item in kMax)
+            {
+                int k = item;
+                Console.Write(++k + " ");
+            }
+
+            Console.WriteLine(" ");
+
+            Console.Write("K2-Opt: ");
+            foreach (var item in kOptim)
+            {
+                int k = item;
+                Console.Write(++k + " ");
+            }
+
+            Console.WriteLine(" ");
+
+            kOptim.Clear();
+            kMax.Clear();
+
+            for (int i = 0; i < k3Matrix.GetLength(0); i++)
+            {
+                List<int> op = new List<int>();
+                for (int j = 0; j < k3Matrix.GetLength(1); j++)
+                {
+                    op.Add(k3Matrix[i, j]);
+
+                    if (k3Matrix[i, j] == 0 && Explore_Column(k3Matrix.GetLength(1), j, k3Matrix))
+                    {
+
+                    }
+                    else if (k3Matrix[i, j] == 1)
+                    {
+
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    if (j == k3Matrix.GetLength(0) - 1)
+                    {
+                        if (op.Where(x => x == 0).Count() == 0)
+                        {
+                            kOptim.Add(i);
+                        }
+                        else
+                        {
+                            kMax.Add(i);
+                        }
+                    }
+                }
+                op.Clear();
+
+            }
+
+            Console.Write("K3-Max: ");
+            foreach (var item in kMax)
+            {
+                int k = item;
+                Console.Write(++k + " ");
+            }
+
+            Console.WriteLine(" ");
+
+            Console.Write("K3-Opt: ");
+            foreach (var item in kOptim)
+            {
+                int k = item;
+                Console.Write(++k + " ");
+            }
+
+            Console.WriteLine(" ");
+
+            kOptim.Clear();
+            kMax.Clear();
+
+            for (int i = 0; i < k4Matrix.GetLength(0); i++)
+            {
+                List<int> op = new List<int>();
+                for (int j = 0; j < k4Matrix.GetLength(1); j++)
+                {
+                    op.Add(k4Matrix[i, j]);
+
+                    if (k4Matrix[i, j] == 0 && Explore_Column(k4Matrix.GetLength(1), j, k4Matrix))
+                    {
+
+                    }
+                    else if (k4Matrix[i, j] == 1)
+                    {
+
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    if (j == k4Matrix.GetLength(0) - 1)
+                    {
+                        if (op.Where(x => x == 0).Count() == 0)
+                        {
+                            kOptim.Add(i);
+                        }
+                        else
+                        {
+                            kMax.Add(i);
+                        }
+                    }
+                }
+                op.Clear();
+
+            }
+
+            Console.Write("K4-Max: ");
+            foreach (var item in kMax)
+            {
+                int k = item;
+                Console.Write(++k + " ");
+            }
+
+            Console.WriteLine(" ");
+
+            Console.Write("K4-Opt: ");
+            foreach (var item in kOptim)
+            {
+                int k = item;
+                Console.Write(++k + " ");
+            }
+
+            Console.Write("\n");
+            Console.WriteLine("========================================================");
+            Console.WriteLine("\n ");
+        }
+        public static bool Explore_Column(int lenght, int j, int[,] kmatrix)
+        {
+            for (int k = 0; k < lenght; k++)
+            {
+                if (kmatrix[k, j] == 1)
+                {
+                    return false;
                 }
             }
-            return new int[1,1];
+            return true;
+        }
+        public static int[,] kOpt(int[,] sym, int[,]asym, int[,]nonComp, int size, int k)
+        {
+            int[,] down = new int[size, size];
+
+            switch (k)
+            {
+                case 1:
+                    {
+                        for (int i = 0; i < size; i++)
+                        {
+                            for (int j = 0; j < size; j++)
+                            {
+                                if (sym[i, j] == 1)
+                                {
+                                    down[i, j] = 1;
+                                }
+                                else if (asym[i, j] == 1)
+                                {
+                                    down[i, j] = 1;
+                                }
+                                else if(nonComp[i, j] == 1)
+                                {
+                                    down[i, j] = 1;
+                                }
+                                else
+                                {
+                                    down[i, j] = 0;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 2:
+                    {
+                        for (int i = 0; i < size; i++)
+                        {
+                            for (int j = 0; j < size; j++)
+                            {
+                                if (asym[i, j] == 1)
+                                {
+                                    down[i, j] = 1;
+                                }
+                                else if(nonComp[i, j] == 1)
+                                {
+                                    down[i, j] = 1;
+                                }
+                                else
+                                {
+                                    down[i, j] = 0;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 3:
+                    {
+                        for (int i = 0; i < size; i++)
+                        {
+                            for (int j = 0; j < size; j++)
+                            {
+                                if (asym[i, j] == 1)
+                                {
+                                    down[i, j] = 1;
+                                }
+                                else if(sym[i, j] == 1)
+                                {
+                                    down[i, j] = 1;
+                                }
+                                else
+                                {
+                                    down[i, j] = 0;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 4:
+                    {
+                        for (int i = 0; i < size; i++)
+                        {
+                            for (int j = 0; j < size; j++)
+                            {
+                                if (asym[i, j] == 1)
+                                {
+                                    down[i, j] = 1;
+                                }                               
+                                else
+                                {
+                                    down[i, j] = 0;
+                                }
+                            }
+                        }
+                    }
+                    break;                
+            }
+            
+            return down;
         }
         public static string[,] СombineMatrix(string[,] symetricPart, string[,] asymetricPart, string[,] nonComparabilityRatio)
         {
