@@ -273,7 +273,7 @@ namespace lab2_TPR
             k3Matrix = kOpt(symetricPart, asymetricPart, null, matrix.GetLength(0), 3);
             k4Matrix = kOpt(null, asymetricPart, null, matrix.GetLength(0), 4);
 
-            WriteMatrix(k4Matrix);
+            
             List<int> kMax = new List<int>();
             List<int> kOptim = new List<int>();
 
@@ -645,8 +645,20 @@ namespace lab2_TPR
         }
         public static void ReadMatrix(ref int[,] matrix)
         {
-
             string[] mass = File.ReadAllLines("D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\MATRIX.txt");
+            for (int p = 0; p < mass.Length; p++)
+            {
+                int[] m = mass[p].Split(new char[] { ' ' },
+              StringSplitOptions.RemoveEmptyEntries).Select(s => int.Parse(s)).ToArray();
+                for (int i = 0; i < m.Length; i++)
+                {
+                    matrix[p, i] = m[i];
+                }
+            }
+        }
+        public static void ReadCriteria(ref int[,] matrix)
+        {
+            string[] mass = File.ReadAllLines("D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\Criteria.txt");
             for (int p = 0; p < mass.Length; p++)
             {
                 int[] m = mass[p].Split(new char[] { ' ' },
@@ -771,13 +783,22 @@ namespace lab2_TPR
             int[,] matrix = new int[mass.Length, mass.Length];
             ReadMatrix(ref matrix);
 
+            string[] criteriaM = File.ReadAllLines("D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\Criteria.txt");
+            int[,] criteria = new int[criteriaM.Length, 12];
+            ReadCriteria(ref criteria);
+
             while (true)
             {
                 Console.WriteLine("Identify plural of the best alternatives using the principle:\n" +
                                 "1) Domination;\n" +
                                 "2) Locking;\n" +
                                 "3) Сyclicity check;\n" +
-                                "4) Exit\n" +
+                                "4) Build an advantage relationship on the principle of Pareto;\n" +
+                                "5) Build an advantage relationship if the criteria are balanced (majority);\n" +
+                                "6) Build an advantage relationship if the set of criteria specifies a strict order relation(lexicographical);\n" +
+                                "7) Build an advantage relationship if the set of quasi-orders is given on the set of criteria (Berezovsky);\n" +
+                                "8) Build an advantage relationship if the criteria are equilibrium (Podinovsky);\n" +
+                                "9) Exit\n" +
                                 "Your choose: ");
                 int n = int.Parse(Console.ReadLine());
                 switch (n)
@@ -792,6 +813,16 @@ namespace lab2_TPR
                         Сhoose_Alghoritm(matrix);
                         break;
                     case 4:
+                        break;
+                    case 5:
+                        break;
+                    case 6:
+                        break;
+                    case 7:
+                        break;
+                    case 8:
+                        break;
+                    case 9:
                         Console.WriteLine("Bye");
                         return;
                     default:
