@@ -7,6 +7,187 @@ namespace lab2_TPR
 {
     class Program
     {
+        private static int[,] Pareto(int[,] criteria)
+        {
+            List<int> mas = new List<int>();
+            int[,] matrix = new int[criteria.GetLength(0), criteria.GetLength(0)];
+            WriteMatrix(criteria);           
+
+            for (int m = 0; m < matrix.GetLength(0); m++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    if (m == j)
+                        matrix[m, j] = 1;
+                }
+            }
+
+            int p = 1;
+
+            for (int i = 0; i < matrix.GetLength(0)-1; i++)
+            {
+                for (int j = i+1; j < matrix.GetLength(1); j++)
+                {
+                    
+                    for (int k = 0; k < criteria.GetLength(1); k++)
+                    {
+                        int number = criteria[i,k] - criteria[i+p,k];
+                        if (number < 0)
+                        {
+                            number = -1;
+                        }
+
+                        else if (number == 0)
+                        {
+                            number = 0;
+                        }
+
+                        else
+                            number = 1;
+
+                        mas.Add(number);
+                    }
+
+                    p++;
+
+                    if (mas.Any(x => x == -1))
+                    {
+                        matrix[i,j] = 0;
+                    }
+
+                    else
+                    {
+                        matrix[i,j] = 1;
+                    }
+
+                    List<int> tempMas = new List<int>();
+                    foreach (var item in mas)
+                    {
+                        int temp = item * -1;
+                        tempMas.Add(temp);
+                    }
+
+                    if (tempMas.Any(x => x == -1))
+                    {
+                        matrix[j, i] = 0;
+                    }
+
+                    else
+                    {
+                        matrix[j, i] = 1;
+                    }
+
+                    tempMas.Clear();
+                    mas.Clear();
+
+                }
+                p = 1;
+            }
+
+            WriteMatrix(matrix);
+            return matrix;
+        }
+        private static int[,] Padenovski(int[,] criteria)
+        {
+            WriteMatrix(criteria);
+
+            List<int> mas = new List<int>();
+            int[,] matrix = new int[criteria.GetLength(0), criteria.GetLength(0)];
+            List<int> row = new List<int>();
+
+            for (int i = 0; i < criteria.GetLength(0); i++)
+            {
+                for (int j = 0; j < criteria.GetLength(1); j++)
+                {
+                    row.Add(criteria[i, j]);
+                }
+                row.Sort();
+                row.Reverse();
+
+                int m = 0;
+                foreach (var item in row)
+                {
+                    criteria[i, m] = item;
+                    m++;
+                }
+
+                row.Clear();
+            }
+
+            for (int m = 0; m < matrix.GetLength(0); m++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    if (m == j)
+                        matrix[m, j] = 1;
+                }
+            }
+
+            int p = 1;
+
+            for (int i = 0; i < matrix.GetLength(0) - 1; i++)
+            {
+                for (int j = i + 1; j < matrix.GetLength(1); j++)
+                {
+
+                    for (int k = 0; k < criteria.GetLength(1); k++)
+                    {
+                        int number = criteria[i, k] - criteria[i + p, k];
+                        if (number < 0)
+                        {
+                            number = -1;
+                        }
+
+                        else if (number == 0)
+                        {
+                            number = 0;
+                        }
+
+                        else
+                            number = 1;
+
+                        mas.Add(number);
+                    }
+
+                    p++;
+
+                    if (mas.Any(x => x == -1))
+                    {
+                        matrix[i, j] = 0;
+                    }
+
+                    else
+                    {
+                        matrix[i, j] = 1;
+                    }
+
+                    List<int> tempMas = new List<int>();
+                    foreach (var item in mas)
+                    {
+                        int temp = item * -1;
+                        tempMas.Add(temp);
+                    }
+
+                    if (tempMas.Any(x => x == -1))
+                    {
+                        matrix[j, i] = 0;
+                    }
+
+                    else
+                    {
+                        matrix[j, i] = 1;
+                    }
+
+                    tempMas.Clear();
+                    mas.Clear();
+
+                }
+                p = 1;
+            }
+
+            WriteMatrix(matrix);
+            return matrix;
+        }
         private static void Domination(int[,] matrix)
         {
             
@@ -669,6 +850,22 @@ namespace lab2_TPR
                 }
             }
         }
+        public static void WriteMatrixToFile(ref int[,] matrix)
+        {
+            string filePath = "D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\MATRIX.txt";
+
+            File.WriteAllText(filePath, string.Empty);
+            string message = "";
+            for (int j = 0; j < matrix.GetLength(0); j++)
+            {
+                for (int i = 0; i < matrix.GetLength(1); i++)
+                {
+                    message += " " + matrix[j, i].ToString();
+                }
+                File.AppendAllText(filePath, message + Environment.NewLine);
+                message = "";
+            }           
+        }
         public static void WriteMatrix(int[,] matrix)
         {
             Console.WriteLine("====================================================================");
@@ -813,14 +1010,18 @@ namespace lab2_TPR
                         Сhoose_Alghoritm(matrix);
                         break;
                     case 4:
+                        int[,] mas1= Pareto(criteria);
+                        WriteMatrixToFile(ref mas1);
                         break;
-                    case 5:
+                    case 5:                        
                         break;
                     case 6:
                         break;
                     case 7:
                         break;
                     case 8:
+                        int[,] mas2 = Padenovski(criteria);
+                        WriteMatrixToFile(ref mas2);
                         break;
                     case 9:
                         Console.WriteLine("Bye");
