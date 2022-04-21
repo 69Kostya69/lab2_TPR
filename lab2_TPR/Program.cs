@@ -88,6 +88,7 @@ namespace lab2_TPR
             return matrix;
         }
         private static int[,] Padenovski(int[,] criteria)
+
         {
             WriteMatrix(criteria);
 
@@ -169,6 +170,86 @@ namespace lab2_TPR
                     }
 
                     if (tempMas.Any(x => x == -1))
+                    {
+                        matrix[j, i] = 0;
+                    }
+
+                    else
+                    {
+                        matrix[j, i] = 1;
+                    }
+
+                    tempMas.Clear();
+                    mas.Clear();
+
+                }
+                p = 1;
+            }
+
+            WriteMatrix(matrix);
+            return matrix;
+        }
+        private static int[,] Majority(int[,] criteria)
+        {
+            List<int> mas = new List<int>();
+            int[,] matrix = new int[criteria.GetLength(0), criteria.GetLength(0)];
+            WriteMatrix(criteria);
+
+            for (int m = 0; m < matrix.GetLength(0); m++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    if (m == j)
+                        matrix[m, j] = 0;
+                }
+            }
+
+            int p = 1;
+
+            for (int i = 0; i < matrix.GetLength(0) - 1; i++)
+            {
+                for (int j = i + 1; j < matrix.GetLength(1); j++)
+                {
+
+                    for (int k = 0; k < criteria.GetLength(1); k++)
+                    {
+                        int number = criteria[i, k] - criteria[i + p, k];
+                        if (number < 0)
+                        {
+                            number = -1;
+                        }
+
+                        else if (number == 0)
+                        {
+                            number = 0;
+                        }
+
+                        else
+                            number = 1;
+
+                        mas.Add(number);
+                    }
+
+                    p++;
+
+                    if (mas.Sum()<=0)
+                    {
+                        matrix[i, j] = 0;
+                    }
+
+                    else
+                    {
+                        matrix[i, j] = 1;
+                    }
+
+                    List<int> tempMas = new List<int>();
+                    foreach (var item in mas)
+                    {
+                        int temp = item * -1;
+                        tempMas.Add(temp);
+                    }
+
+                    if (tempMas.Sum()<=0)
                     {
                         matrix[j, i] = 0;
                     }
@@ -976,16 +1057,19 @@ namespace lab2_TPR
 
         static void Main(string[] args)
         {
-            string[] mass = File.ReadAllLines("D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\MATRIX.txt");
-            int[,] matrix = new int[mass.Length, mass.Length];
-            ReadMatrix(ref matrix);
-
-            string[] criteriaM = File.ReadAllLines("D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\Criteria.txt");
-            int[,] criteria = new int[criteriaM.Length, 12];
-            ReadCriteria(ref criteria);
+            
 
             while (true)
             {
+
+                string[] mass = File.ReadAllLines("D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\MATRIX.txt");
+                int[,] matrix = new int[mass.Length, mass.Length];
+                ReadMatrix(ref matrix);
+
+                string[] criteriaM = File.ReadAllLines("D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\Criteria.txt");
+                int[,] criteria = new int[criteriaM.Length, 12];
+                ReadCriteria(ref criteria);
+
                 Console.WriteLine("Identify plural of the best alternatives using the principle:\n" +
                                 "1) Domination;\n" +
                                 "2) Locking;\n" +
@@ -1013,7 +1097,9 @@ namespace lab2_TPR
                         int[,] mas1= Pareto(criteria);
                         WriteMatrixToFile(ref mas1);
                         break;
-                    case 5:                        
+                    case 5:
+                        int[,] mas3 = Majority(criteria);
+                        WriteMatrixToFile(ref mas3);
                         break;
                     case 6:
                         break;
