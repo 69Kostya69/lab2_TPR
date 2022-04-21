@@ -269,6 +269,294 @@ namespace lab2_TPR
             WriteMatrix(matrix);
             return matrix;
         }
+        private static int[,] Lexicographical(int[,] criteria, int[] importance)
+        {
+            List<int> mas = new List<int>();
+            int[,] matrix = new int[criteria.GetLength(0), criteria.GetLength(0)];
+            WriteMatrix(criteria);
+
+            for (int m = 0; m < matrix.GetLength(0); m++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    if (m == j)
+                        matrix[m, j] = 0;
+                }
+            }
+
+            int p = 1;
+
+            for (int i = 0; i < matrix.GetLength(0) - 1; i++)
+            {
+                for (int j = i + 1; j < matrix.GetLength(1); j++)
+                {
+
+                    for (int k = 0; k < criteria.GetLength(1); k++)
+                    {
+                        int number = criteria[i, k] - criteria[i + p, k];
+                        if (number < 0)
+                        {
+                            number = -1;
+                        }
+
+                        else if (number == 0)
+                        {
+                            number = 0;
+                        }
+
+                        else
+                            number = 1;
+
+                        mas.Add(number);
+                    }
+
+                    p++;
+                    int index = 0;
+
+                    int[] massiv = new int[mas.Count];
+                    int[] result = new int[mas.Count];
+                    foreach (var item in mas)
+                    {
+                        massiv[index] = item;
+                        index++;
+                    }
+
+                    for (int c = 0; c < massiv.Length; c++)
+                    {                       
+                        result[c] = massiv[importance[c]-1];
+                    }
+
+                    for (int q = 0; q < mas.Count; q++)
+                    {
+                        if (result[q]==0)
+                        {
+                            continue;
+                        }
+
+                        else if (result[q] == 0 && q==mas.Count-1)
+                        {
+                            matrix[i, j] = 0;
+                            matrix[j, i] = 0;
+                        }
+
+                        else if(result[q]==1)
+                        {
+                            matrix[i, j] = 1;
+                            matrix[j, i] = 0;
+                            break;
+                        }
+                        else
+                        {
+                            matrix[i, j] = 0;
+                            matrix[j, i] = 1;
+                            break;
+                        }
+                    }
+                    mas.Clear();
+                }
+                p = 1;
+            }
+
+            WriteMatrix(matrix);
+            return matrix;
+        }
+        private static int[,] Berezovsky(int[,] criteria, int[] class1, int[] class2, int[] class3)
+        {
+            int[,] criteria1 = new int[criteria.GetLength(0), class1.Length];
+            int[,] criteria2 = new int[criteria.GetLength(0), class2.Length];
+            int[,] criteria3 = new int[criteria.GetLength(0), class3.Length];
+
+            for (int i = 0; i < criteria.GetLength(0); i++)
+            {
+                for (int j = 0; j < class1.Length; j++)
+                {
+                    criteria1[i, j] = criteria[i, class1[j]-1];
+                }
+            }
+
+            for (int i = 0; i < criteria.GetLength(0); i++)
+            {
+                for (int j = 0; j < class2.Length; j++)
+                {
+                    criteria2[i, j] = criteria[i, class2[j]-1];
+                }
+            }
+
+            for (int i = 0; i < criteria.GetLength(0); i++)
+            {
+                for (int j = 0; j < class3.Length; j++)
+                {
+                    criteria3[i, j] = criteria[i, class3[j]-1];
+                }
+            }
+
+            Console.WriteLine("First class:");
+            int[,] res1 = Pareto(criteria1);
+            Console.WriteLine("Second class:");
+            int[,] res2 = Pareto(criteria2);
+            Console.WriteLine("Third class:");
+            int[,] res3 = Pareto(criteria3);
+
+            int[,] reverseMatrix1 = new int[res1.GetLength(0),res1.GetLength(1)];
+            int[,] symetricPart1 = new int[res1.GetLength(0), res1.GetLength(1)];
+            int[,] asymetricPart1 = new int[res1.GetLength(0), res1.GetLength(1)];
+            int[,] nonComparabilityRatio1 = new int[res1.GetLength(0), res1.GetLength(1)];
+            int[,] reverseMatrix2 = new int[res2.GetLength(0), res2.GetLength(1)];
+            int[,] symetricPart2 = new int[res2.GetLength(0), res2.GetLength(1)];
+            int[,] asymetricPart2 = new int[res2.GetLength(0), res2.GetLength(1)];
+            int[,] nonComparabilityRatio2 = new int[res2.GetLength(0), res2.GetLength(1)];
+            int[,] reverseMatrix3 = new int[res3.GetLength(0), res3.GetLength(1)];
+            int[,] symetricPart3 = new int[res3.GetLength(0), res3.GetLength(1)];
+            int[,] asymetricPart3 = new int[res3.GetLength(0), res3.GetLength(1)];
+            int[,] nonComparabilityRatio3 = new int[res3.GetLength(0), res3.GetLength(1)];
+
+            Matrix matr1 = new Matrix(res1);
+            reverseMatrix1 = matr1.Reverse();
+            symetricPart1 = matr1.GetSymetricPart(reverseMatrix1);
+            asymetricPart1 = matr1.GetAsymetricPart();
+            nonComparabilityRatio1 = matr1.GetNonComparabilityRatio();
+            Matrix matr2 = new Matrix(res2);
+            reverseMatrix2 = matr2.Reverse();
+            symetricPart2 = matr2.GetSymetricPart(reverseMatrix2);
+            asymetricPart2 = matr2.GetAsymetricPart();
+            nonComparabilityRatio2 = matr2.GetNonComparabilityRatio();
+            Matrix matr3 = new Matrix(res3);
+            reverseMatrix3 = matr3.Reverse();
+            symetricPart3 = matr3.GetSymetricPart(reverseMatrix3);
+            asymetricPart3 = matr3.GetAsymetricPart();
+            nonComparabilityRatio3 = matr3.GetNonComparabilityRatio();
+
+
+
+            Console.WriteLine("I01");
+            WriteMatrix(symetricPart1);
+            Console.WriteLine("P01");
+            WriteMatrix(asymetricPart1);
+            Console.WriteLine("N01");
+            WriteMatrix(nonComparabilityRatio1);
+
+            Console.WriteLine("I02");
+            WriteMatrix(symetricPart2);
+            Console.WriteLine("P02");
+            WriteMatrix(asymetricPart2);
+            Console.WriteLine("N02");
+            WriteMatrix(nonComparabilityRatio2);
+
+            Console.WriteLine("I03");
+            WriteMatrix(symetricPart3);
+            Console.WriteLine("P03");
+            WriteMatrix(asymetricPart3);
+            Console.WriteLine("N03");
+            WriteMatrix(nonComparabilityRatio3);
+
+            int[,] result = new int[criteria.GetLength(0), criteria.GetLength(0)];
+
+            int[,] P2symetricPart = new int[res1.GetLength(0), res1.GetLength(1)];
+            int[,] P2asymetricPart = new int[res1.GetLength(0), res1.GetLength(1)];
+            int[,] P2nonComparabilityRatio = new int[res1.GetLength(0), res1.GetLength(1)];
+
+            for (int i = 0; i < criteria.GetLength(0); i++)
+            {
+                for (int j  = 0; j < criteria.GetLength(0); j++)
+                {
+                    if ((asymetricPart2[i, j] == 1 && (asymetricPart1[i, j] == 1 || nonComparabilityRatio1[i, j] == 1 || symetricPart1[i, j] == 1))
+                        || (symetricPart2[i, j] == 1 && asymetricPart1[i, j] == 1))
+                    {
+                        P2asymetricPart[i, j] = 1;
+                    }
+                    else
+                    {
+                        P2asymetricPart[i, j] = 0;
+                    }
+
+                    if(symetricPart2[i,j]==1 && symetricPart1[i,j]==1)
+                    {
+                        P2symetricPart[i, j] = 1;
+                    }
+                    else
+                    {
+                        P2symetricPart[i, j] = 0;
+                    }                  
+                }
+            }
+
+            for (int i = 0; i < criteria.GetLength(0); i++)
+            {
+                for (int j = 0; j < criteria.GetLength(0); j++)
+                {
+                    if (!(P2asymetricPart[i, j] == 1 || P2asymetricPart[j,i]==1 || P2symetricPart[i,j]==1))
+                    {
+                        P2nonComparabilityRatio[i, j] = 1;
+                    }
+                    else
+                    {
+                        P2nonComparabilityRatio[i, j] = 0;
+                    }
+                }
+            }
+
+            int[,] P3symetricPart = new int[res1.GetLength(0), res1.GetLength(1)];
+            int[,] P3asymetricPart = new int[res1.GetLength(0), res1.GetLength(1)];
+            int[,] P3nonComparabilityRatio = new int[res1.GetLength(0), res1.GetLength(1)];
+
+            for (int i = 0; i < criteria.GetLength(0); i++)
+            {
+                for (int j = 0; j < criteria.GetLength(0); j++)
+                {
+                    if ((asymetricPart3[i, j] == 1 && (P2asymetricPart[i, j] == 1 || P2nonComparabilityRatio[i, j] == 1 || P2symetricPart[i, j] == 1))
+                        || (symetricPart3[i, j] == 1 && P2asymetricPart[i, j] == 1))
+                    {
+                        P3asymetricPart[i, j] = 1;
+                    }
+                    else
+                    {
+                        P3asymetricPart[i, j] = 0;
+                    }
+
+                    if (symetricPart3[i, j] == 1 && P2symetricPart[i, j] == 1)
+                    {
+                        P3symetricPart[i, j] = 1;
+                    }
+                    else
+                    {
+                        P3symetricPart[i, j] = 0;
+                    }
+                }
+            }
+
+            for (int i = 0; i < criteria.GetLength(0); i++)
+            {
+                for (int j = 0; j < criteria.GetLength(0); j++)
+                {
+                    if (!(P3asymetricPart[i, j] == 1 || P3asymetricPart[j, i] == 1 || P3symetricPart[i, j] == 1))
+                    {
+                        P3nonComparabilityRatio[i, j] = 1;
+                    }
+                    else
+                    {
+                        P3nonComparabilityRatio[i, j] = 0;
+                    }
+                }
+            }
+
+            for (int i = 0; i < P3symetricPart.GetLength(0); i++)
+            {
+                for (int j = 0; j < P3symetricPart.GetLength(0); j++)
+                {
+                    if (P3symetricPart[i,j]==1 || P3asymetricPart[i,j]==1)
+                    {
+                        result[i, j] = 1;
+                    }
+                    else
+                    {
+                        result[i, j] = 0;
+                    }
+                }
+            }
+
+            WriteMatrix(result);
+            return result;
+        }
         private static void Domination(int[,] matrix)
         {
             
@@ -1102,8 +1390,51 @@ namespace lab2_TPR
                         WriteMatrixToFile(ref mas3);
                         break;
                     case 6:
+                        int[] koef = new int[criteria.GetLength(1)];
+                        Console.WriteLine("Sort the criteria in descending order of importance!");
+                        for (int i = 0; i < criteria.GetLength(1); i++)
+                        {
+                            int k = int.Parse(Console.ReadLine());
+                            koef[i] = k;
+                        }
+                        int[,] mas4 = Lexicographical(criteria, koef);
+                        WriteMatrixToFile(ref mas4);                     
                         break;
                     case 7:
+                        Console.WriteLine("Arrange the classes in ascending order of importance!");
+
+                        Console.WriteLine("Specify the number of criteria in the first class:");
+                        int k1 = int.Parse(Console.ReadLine());
+                        int[] criteria1 = new int[k1];
+                        for (int i = 0; i < k1; i++)
+                        {
+                            Console.WriteLine("Enter № criterion belonging to the 1 class");
+                            int k = int.Parse(Console.ReadLine());
+                            criteria1[i] = k;
+                        }
+                        Console.WriteLine("Specify the number of criteria in the second class:");
+                        int k2 = int.Parse(Console.ReadLine());
+                        int[] criteria2 = new int[k2];
+                        for (int i = 0; i < k2; i++)
+                        {
+                            Console.WriteLine("Enter № criterion belonging to the 2 class");
+                            int k = int.Parse(Console.ReadLine());
+                            criteria2[i] = k;
+                        }
+                        Console.WriteLine("Specify the number of criteria in the third class:");
+                        int k3 = int.Parse(Console.ReadLine());
+                        int[] criteria3 = new int[k3];
+                        for (int i = 0; i < k3; i++)
+                        {
+                            Console.WriteLine("Enter № criterion belonging to the 3 class");
+                            int k = int.Parse(Console.ReadLine());
+                            criteria3[i] = k;
+                        }
+
+                        Console.WriteLine();
+
+                        int[,] mas5 = Berezovsky(criteria,criteria1,criteria2,criteria3);
+                        WriteMatrixToFile(ref mas5);
                         break;
                     case 8:
                         int[,] mas2 = Padenovski(criteria);
