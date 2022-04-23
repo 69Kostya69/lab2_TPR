@@ -568,6 +568,133 @@ namespace lab2_TPR
             WriteMatrix(result);
             return result;
         }
+        private static int[,] Electre(int[,] criteria, int[] balance, double c, double d)
+        {
+            int BalanceSum = balance.Sum();
+            int[,] matrix = new int[criteria.GetLength(0), criteria.GetLength(0)];
+            double[,] consistency = new double[criteria.GetLength(0), criteria.GetLength(0)];
+            double[,] non_consistency = new double[criteria.GetLength(0), criteria.GetLength(0)];
+            double[] non_consistency_znamenic = new double[balance.GetLength(0)];
+            WriteMatrix(criteria);
+            List<int> maxmin = new List<int>();
+
+            for (int i = 0; i < balance.GetLength(0); i++)
+            {
+                
+                for (int j = 0; j < 15; j++)
+                {
+                    maxmin.Add(criteria[j, i]);
+                }
+                int max = maxmin.Max();
+                int min = maxmin.Min();
+                non_consistency_znamenic[i] = (balance[i] * Math.Abs(max - min));
+                maxmin.Clear();
+            }
+
+            List<int> kPlus = new List<int>();
+            List<int> kEqual = new List<int>();
+            List<int> kMinus = new List<int>();
+            Dictionary<int, int> kMinusDict = new Dictionary<int, int>();
+
+
+            int Pplus = 0;
+            int Pequal = 0;
+            int Pminus = 0;
+
+            int p = 1;
+            int p2 = 1;
+            for (int i = 0; i < matrix.GetLength(0) - 1; i++)
+            {
+                for (int j = i + 1; j < matrix.GetLength(1); j++)
+                {
+
+                    for (int k = 0; k < criteria.GetLength(1); k++)
+                    {
+                        if(criteria[i,k]>criteria[i+p,k])
+                        {
+                            kPlus.Add(balance[k]);
+                        }
+
+                        else if(criteria[i, k] < criteria[i + p, k])
+                        {
+                            kMinus.Add(balance[k]);
+                            kMinusDict.Add(k, balance[k]);
+                        }
+
+                        else
+                        {
+                            kEqual.Add(balance[k]);
+                        }
+                    }
+                    p++;
+
+                    Pplus = kPlus.Sum();
+                    Pminus = kMinus.Sum();
+                    Pequal = kEqual.Sum();
+
+                    double match = ((Pplus + Pequal) / BalanceSum);
+                    consistency[i, j] = Math.Round(match, 3);
+                    double mismatch = 0;
+
+                    if (kMinus.Count()==0)
+                    {
+                        mismatch = 0;
+                    }
+                    else
+                    {
+                        List<double> X = new List<double>();
+                        List<double> Y = new List<double>();
+                        double max_X = 0.0;
+                        double max_Y = 0.0;
+
+                        foreach (var item in kMinusDict)
+                        {
+                            X.Add(item.Value* Math.Abs(criteria[i,item.Key]-criteria[i+p2,item.Key]));
+                            Y.Add(non_consistency_znamenic[item.Key]);
+                        }
+
+                        p2++;
+                        max_X = X.Max();
+                        max_Y = Y.Max();
+                        mismatch = max_X / max_Y;
+
+                        X.Clear();
+                        Y.Clear();
+                    }
+
+                    non_consistency[i, j] = Math.Round(mismatch, 3);
+
+                    if(match >= c && mismatch <= d)
+                    {
+                        matrix[i, j] = 1;
+                    }
+                    else
+                    {
+                        matrix[i, j] = 0;
+                    }
+
+                    match = 0;
+                    mismatch = 0;
+                    kEqual.Clear();
+                    kMinusDict.Clear();
+                    kMinus.Clear();
+                    kPlus.Clear();
+                    Pplus = 0;
+                    Pminus = 0;
+                    Pequal = 0;
+                }
+                p = 1;
+                p2 = 1;
+            }
+
+            Console.WriteLine("Consistency matrix:");
+            WriteMatrix(consistency);
+            Console.WriteLine("Mismatch matrix:");
+            WriteMatrix(non_consistency);
+            Console.WriteLine("Result:");
+            WriteMatrix(matrix);
+            return matrix;
+        }
         private static void Domination(int[,] matrix)
         {
             
@@ -1260,6 +1387,20 @@ namespace lab2_TPR
             }
             Console.WriteLine("\n");
         }
+        public static void WriteMatrix(double[,] matrix)
+        {
+            Console.WriteLine("====================================================================");
+            Console.WriteLine("Matrix:");
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    Console.Write(matrix[i, j] + " ");
+                }
+                Console.WriteLine("  ");
+            }
+            Console.WriteLine("\n");
+        }
         public static void WriteMatrix(string[,] matrix)
         {
             Console.WriteLine("====================================================================");
@@ -1450,10 +1591,26 @@ namespace lab2_TPR
                         break;
                     case 8:
                         int[,] mas2 = Padenovski(criteria);
+                        double Match = 0.0;
+                        double Mismatch = 0.0;
                         WriteMatrixToFile(ref mas2);
                         break;
                     case 9:
-                        
+                        int[] balance = new int[criteria.GetLength(1)];
+                        for (int i = 0; i < criteria.GetLength(1); i++)
+                        {
+                            Console.WriteLine($"Enter the weighting factor of criterion №{i+1}:");
+                            balance[i] = int.Parse(Console.ReadLine());
+                        }
+                        Console.WriteLine("==================================================");
+
+                        Console.WriteLine("Enter a threshold value for the matching index (c):");
+                        Match = double.Parse(Console.ReadLine());
+                        Console.WriteLine("Enter a threshold value for the mismatch index (d):");
+                        Mismatch = double.Parse(Console.ReadLine());
+
+                        int[,] mas6 = Electre(criteria, balance, Match, Mismatch);
+                        WriteMatrixToFile(ref mas6);
                         break;
                     case 10:
                         Console.WriteLine("Bye");
