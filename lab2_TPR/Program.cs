@@ -554,6 +554,17 @@ namespace lab2_TPR
                 }
             }
 
+            for (int i = 0; i < 20; i++)
+            {
+                for (int j = i; j < 20; j++)
+                {
+                    if(result[i, j]==1 && result[j,i]==1)
+                    {
+                        result[i,j] = 0;
+                        result[j,i] = 0;
+                    }
+                }
+            }
             WriteMatrix(result);
             return result;
         }
@@ -1367,7 +1378,8 @@ namespace lab2_TPR
                                 "6) Build an advantage relationship if the set of criteria specifies a strict order relation(lexicographical);\n" +
                                 "7) Build an advantage relationship if the set of quasi-orders is given on the set of criteria (Berezovsky);\n" +
                                 "8) Build an advantage relationship if the criteria are equilibrium (Podinovsky);\n" +
-                                "9) Exit\n" +
+                                "9) Electre;\n" +
+                                "10) Exit\n" +
                                 "Your choose: ");
                 int n = int.Parse(Console.ReadLine());
                 switch (n)
@@ -1441,6 +1453,9 @@ namespace lab2_TPR
                         WriteMatrixToFile(ref mas2);
                         break;
                     case 9:
+                        
+                        break;
+                    case 10:
                         Console.WriteLine("Bye");
                         return;
                     default:
