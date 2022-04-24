@@ -594,15 +594,24 @@ namespace lab2_TPR
             List<int> kPlus = new List<int>();
             List<int> kEqual = new List<int>();
             List<int> kMinus = new List<int>();
+            List<int> kPlusM = new List<int>();
+            List<int> kEqualM = new List<int>();
+            List<int> kMinusM = new List<int>();
             Dictionary<int, int> kMinusDict = new Dictionary<int, int>();
+            Dictionary<int, int> kPlusDict = new Dictionary<int, int>();
 
 
-            int Pplus = 0;
-            int Pequal = 0;
-            int Pminus = 0;
+            double Pplus = 0;
+            double Pequal = 0;
+            double Pminus = 0;
+
+            double PplusM = 0;
+            double PequalM = 0;
+            double PminusM = 0;
 
             int p = 1;
             int p2 = 1;
+            int p3 = 1;
             for (int i = 0; i < matrix.GetLength(0) - 1; i++)
             {
                 for (int j = i + 1; j < matrix.GetLength(1); j++)
@@ -613,6 +622,7 @@ namespace lab2_TPR
                         if(criteria[i,k]>criteria[i+p,k])
                         {
                             kPlus.Add(balance[k]);
+                            kPlusDict.Add(k, balance[k]);
                         }
 
                         else if(criteria[i, k] < criteria[i + p, k])
@@ -673,24 +683,106 @@ namespace lab2_TPR
                         matrix[i, j] = 0;
                     }
 
+                    kPlusM.AddRange(kMinus);
+                    kMinusM.AddRange(kPlus);
+                    kEqualM.AddRange(kEqual);
+                    
                     match = 0;
                     mismatch = 0;
                     kEqual.Clear();
                     kMinusDict.Clear();
+                    foreach (var item in kPlusDict)
+                    {
+                        kMinusDict.Add(item.Key, item.Value);
+                    }
                     kMinus.Clear();
                     kPlus.Clear();
+                    kPlusDict.Clear();
                     Pplus = 0;
                     Pminus = 0;
                     Pequal = 0;
+
+                    ////////////////////////////////////////////////////    
+                    
+                    PplusM = kPlusM.Sum();
+                    PminusM = kMinusM.Sum();
+                    PequalM = kEqualM.Sum();
+
+                    match = ((PplusM + PequalM) / BalanceSum);
+                    consistency[j, i] = Math.Round(match, 3);
+
+                    if (kMinusM.Count() == 0)
+                    {
+                        mismatch = 0;
+                    }
+                    else
+                    {
+                        List<double> X = new List<double>();
+                        List<double> Y = new List<double>();
+                        double max_X = 0.0;
+                        double max_Y = 0.0;
+
+                        foreach (var item in kMinusDict)
+                        {
+                            X.Add(item.Value * Math.Abs(criteria[i, item.Key] - criteria[i + p3, item.Key]));
+                            Y.Add(non_consistency_znamenic[item.Key]);
+                        }
+
+                        p3++;
+                        max_X = X.Max();
+                        max_Y = Y.Max();
+                        mismatch = max_X / max_Y;
+
+                        X.Clear();
+                        Y.Clear();
+                    }
+
+                    non_consistency[j, i] = Math.Round(mismatch, 3);
+
+                    if (match >= c && mismatch <= d)
+                    {
+                        matrix[j, i] = 1;
+                    }
+                    else
+                    {
+                        matrix[j, i] = 0;
+                    }
+                    ///////////////////////////////////////
+                    kMinusDict.Clear();
+                    kPlusDict.Clear();
+                    kPlusM.Clear();
+                    kMinusM.Clear();
+                    kEqualM.Clear();
+                    match = 0;
+                    mismatch = 0;
+                    PplusM = 0;
+                    PminusM = 0;
+                    PequalM = 0;
                 }
                 p = 1;
                 p2 = 1;
+                p3 = 1;
             }
+
+            for (int i = 0; i < consistency.GetLength(0); i++)
+            {
+                for (int j = 0; j < consistency.GetLength(0); j++)
+                {
+                    if (i==j)
+                    {
+                        consistency[i, j] = 0;
+                        non_consistency[i, j] = 1;
+                    }
+                }
+            }
+
 
             Console.WriteLine("Consistency matrix:");
             WriteMatrix(consistency);
+            WriteCONMatrixToFile(ref consistency);
             Console.WriteLine("Mismatch matrix:");
             WriteMatrix(non_consistency);
+            WriteNONCONMatrixToFile(ref non_consistency);
             Console.WriteLine("Result:");
             WriteMatrix(matrix);
             return matrix;
@@ -1372,6 +1464,38 @@ namespace lab2_TPR
                 File.AppendAllText(filePath, message + Environment.NewLine);
                 message = "";
             }           
+        }
+        public static void WriteCONMatrixToFile(ref double[,] matrix)
+        {
+            string filePath = "D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\Match.txt";
+
+            File.WriteAllText(filePath, string.Empty);
+            string message = "";
+            for (int j = 0; j < matrix.GetLength(0); j++)
+            {
+                for (int i = 0; i < matrix.GetLength(1); i++)
+                {
+                    message += " " + matrix[j, i].ToString();
+                }
+                File.AppendAllText(filePath, message + Environment.NewLine);
+                message = "";
+            }
+        }
+        public static void WriteNONCONMatrixToFile(ref double[,] matrix)
+        {
+            string filePath = "D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\Mismatch.txt";
+
+            File.WriteAllText(filePath, string.Empty);
+            string message = "";
+            for (int j = 0; j < matrix.GetLength(0); j++)
+            {
+                for (int i = 0; i < matrix.GetLength(1); i++)
+                {
+                    message += " " + matrix[j, i].ToString();
+                }
+                File.AppendAllText(filePath, message + Environment.NewLine);
+                message = "";
+            }
         }
         public static void WriteMatrix(int[,] matrix)
         {
