@@ -979,13 +979,24 @@ namespace lab2_TPR
                 }
             }
 
+            List<int> res = new List<int>();
             Console.Write("Xhm=");
             foreach (int s in Q)
             {
                 int a = s;
+                res.Add(++a);
                 Console.Write(++a + " ");
             }
 
+            string filePath = "D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\Results.txt";
+            string message = "";
+            foreach (var item in res)
+            {
+                message += $"{item}" + " ";
+            }
+            File.AppendAllText(filePath, message + Environment.NewLine);
+            message = "";
+            
             Console.WriteLine("\n================================================================\n");
         }
         private static List<int> Upper_section(int[,] matrix, int column)
@@ -1644,7 +1655,10 @@ namespace lab2_TPR
                                 "7) Build an advantage relationship if the set of quasi-orders is given on the set of criteria (Berezovsky);\n" +
                                 "8) Build an advantage relationship if the criteria are equilibrium (Podinovsky);\n" +
                                 "9) Electre;\n" +
-                                "10) Exit\n" +
+                                "10) Experiment with (d);\n" +
+                                "11) Experiment with (c);\n" +
+                                "12) Experiment with (c,d);\n" +
+                                "13) Exit\n" +
                                 "Your choose: ");
                 int n = int.Parse(Console.ReadLine());
                 switch (n)
@@ -1737,6 +1751,56 @@ namespace lab2_TPR
                         WriteMatrixToFile(ref mas6);
                         break;
                     case 10:
+                        string filePath = "D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\Results.txt";
+
+                        File.WriteAllText(filePath, string.Empty);
+
+                        int[,] mat = new int[15,15];
+                        int[] balance1 = new int[] { 9, 10, 3, 7, 6, 2, 5, 7, 7, 1, 10, 1 };
+                        for (double i = 0.0; i <=0.5 ; i+=0.1)
+                        {
+                            int[,] mas7 = Electre(criteria, balance1, 0.5, i);
+                            WriteMatrixToFile(ref mas7);
+                            ReadMatrix(ref mat);
+                            Сhoose_Alghoritm(mat);
+                        }
+                        Console.WriteLine("End");
+                        break;
+                    case 11:
+                        string filePath1 = "D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\Results.txt";
+                        File.WriteAllText(filePath1, string.Empty);
+
+                        int[,] mat1 = new int[15, 15];
+                        int[] balance2 = new int[] { 9, 10, 3, 7, 6, 2, 5, 7, 7, 1, 10, 1 };
+                        for (double i = 0.5; i <= 1; i += 0.1)
+                        {
+                            int[,] mas7 = Electre(criteria, balance2, i, 0.49);
+                            WriteMatrixToFile(ref mas7);
+                            ReadMatrix(ref mat1);
+                            Сhoose_Alghoritm(mat1);
+                        }
+                        Console.WriteLine("End");
+                        break;
+                    case 12:
+                        string filePath2 = "D:\\Labs\\4Cours\\Teoria_Rozkladiv\\lab2_TPR\\Results.txt";
+                        File.WriteAllText(filePath2, string.Empty);
+
+                        int[,] mat2 = new int[15, 15];
+                        int[] balance3 = new int[] { 9, 10, 3, 7, 6, 2, 5, 7, 7, 1, 10, 1 };
+                        double k4 = 1.000;
+                        double j4 = 0.000;
+                        for (double i = 1; i <= 5; i++)
+                        {
+                            int[,] mas7 = Electre(criteria, balance3, k4, j4);
+                            WriteMatrixToFile(ref mas7);
+                            ReadMatrix(ref mat2);
+                            Сhoose_Alghoritm(mat2);
+                            k4 -= 0.100;
+                            j4 += 0.100;
+                        }
+                        Console.WriteLine("End");
+                        break;
+                    case 13:
                         Console.WriteLine("Bye");
                         return;
                     default:
